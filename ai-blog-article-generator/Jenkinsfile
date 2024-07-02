@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/theobjectorientedguy/AI-Youtube-Summarizer'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'pip install -r requirements.txt'
+                sh 'py manage.py makemigrations'
+                sh 'py manage.py migrate'
+                echo 'Building the project...'
+            }
+        }
+
+        stage('Run') {
+            steps {
+                sh 'py manage.py runserver'
+                }
+       }
+    }
+}
