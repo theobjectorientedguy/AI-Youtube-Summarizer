@@ -8,19 +8,36 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                # Update package list and install Python and pip
+                apt-get update
+                apt-get install -y python3 python3-pip
+
+                # Install project dependencies
+                pip3 install --upgrade pip
+                pip3 install -r ai-blog-article-generator/requirements.txt
+                '''
+            }
+        }
+
         stage('Build') {
             steps {
-                sh 'pip install -r requirements.txt'
-                sh 'py manage.py makemigrations'
-                sh 'py manage.py migrate'
+                sh '''
+                python3 ai-blog-article-generator/manage.py makemigrations
+                python3 ai-blog-article-generator/manage.py migrate
+                '''
                 echo 'Building the project...'
             }
         }
 
         stage('Run') {
             steps {
-                sh 'py manage.py runserver'
-                }
-       }
+                sh '''
+                python3 ai-blog-article-generator/manage.py runserver 0.0.0.0:8000
+                '''
+            }
+        }
     }
 }
